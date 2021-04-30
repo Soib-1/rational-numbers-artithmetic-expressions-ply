@@ -83,31 +83,59 @@ def p_expression_binop(p):
                 r_denominator = denominator1
                 r_numerator, r_denominator = fractions_shortening(
                     r_numerator, r_denominator)
-                p[0] = str(numerator1+numerator2)+'|'+str(denominator1)
+                p[0] = str(r_numerator)+'|'+str(r_denominator)
             else:
-                p[0] = str(numerator1*denominator2+numerator2 *
-                           denominator1)+'|'+str(denominator1*denominator2)
+                r_numerator = numerator1*denominator2+numerator2 *
+                           denominator1
+                r_denominator = denominator1*denominator2
+                r_numerator, r_denominator = fractions_shortening(
+                    r_numerator, r_denominator)
+                p[0] = str(r_numerator)+'|'+str(r_denominator)
         elif p[2] == '-':
             if denominator1 == denominator2:
-                p[0] = str(numerator1+numerator2)+'|'+str(denominator1)
+                r_numerator = numerator1+numerator2
+                r_denominator = denominator1
+                r_numerator, r_denominator = fractions_shortening(
+                    r_numerator, r_denominator)
+                p[0] = str(r_numerator)+'|'+str(r_denominator)
             else:
-                p[0] = str(numerator1*denominator2-numerator2 *
-                           denominator1)+'|'+str(denominator1*denominator2)
+                r_numerator = numerator1*denominator2-numerator2 *
+                           denominator1
+                r_denominator = denominator1*denominator2
+                r_numerator, r_denominator = fractions_shortening(
+                    r_numerator, r_denominator)
+                p[0] = str(r_numerator)+'|'+str(r_denominator)
         elif p[2] == '*':
-            p[0] = str(numerator1*numerator2)+'|' + \
-                str(denominator1*denominator2)
+            r_numerator = numerator1*numerator2
+            r_denominator = denominator1*denominator2
+            r_numerator, r_denominator = fractions_shortening(
+                r_numerator, r_denominator)
+            p[0] = str(r_numerator)+'|' + \
+                str(r_denominator)
         elif p[2] == '/':
-            p[0] = str(numerator1*denominator2)+'|' + \
-                str(denominator1*numerator2)
+            r_numerator = numerator1*denominator2
+            r_denominator = denominator1*numerator2
+            r_numerator, r_denominator = fractions_shortening(
+                r_numerator, r_denominator)
+            p[0] = str(r_numerator)+'|' + \
+                str(r_denominator)
     elif '|' in p[1]:
         split = p[1].split('|')
         numerator = int(split[0])
         denominator = int(split[1])
         number = int(p[3])
         if p[2] == '+':
-            p[0] = str(numerator+denominator*number)+'|'+str(denominator)
+            r_numerator = numerator+denominator*number
+            r_denominator = denominator
+            r_numerator, r_denominator = fractions_shortening(
+                r_numerator, r_denominator)
+            p[0] = str(r_numerator)+'|'+str(r_denominator)
         elif p[2] == '-':
-            p[0] = str(numerator-denominator*number)+'|'+str(denominator)
+            r_numerator = numerator-denominator*number
+            r_denominator = denominator
+            r_numerator, r_denominator = fractions_shortening(
+                r_numerator, r_denominator)
+            p[0] = str(r_numerator)+'|'+str(denominator)
         elif p[2] == '*':
             p[0] = str(numerator*number)+'|'+str(denominator)
         elif p[2] == '/':
