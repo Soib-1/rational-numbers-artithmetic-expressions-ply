@@ -2,8 +2,11 @@
 
 import ply.yacc as yacc
 import ply.lex as lex
+import sys
+parsedExpressions = -1
+sys.tracebacklimit = 0
 tokens = (
-    'NAME', 'NUMBER',
+    'NUMBER',
     'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'DIVIDER',
     'LPAREN', 'RPAREN',
 )
@@ -24,7 +27,7 @@ def gcd(a, b): return gcd(b, a % b) if b else a
 
 def fractions_shortening(numerator, denominator):
     divider = gcd(numerator, denominator)
-    return numerator/divider, denominator/divider
+    return int(numerator/divider), int(denominator/divider)
 
 
 def t_NUMBER(t):
@@ -42,10 +45,9 @@ def t_newline(t):
     t.lexer.lineno += t.value.count("\n")
 
 
-def t_error(t):
-    print(f"Illegal character {t.value[0]!r}")
-    t.lexer.skip(1)
-
+def t_error(t):   
+    print(f"Niepoprawne wyrażenie, liczba poprawnie obliczonych wyrazen: {parsedExpressions}")
+    raise EOFError
 
 # Build the lexer
 lex.lex()
@@ -85,8 +87,7 @@ def p_expression_binop(p):
                     r_numerator, r_denominator)
                 p[0] = str(r_numerator)+'|'+str(r_denominator)
             else:
-                r_numerator = numerator1*denominator2+numerator2 *
-                           denominator1
+                r_numerator = numerator1*denominator2+numerator2 * denominator1
                 r_denominator = denominator1*denominator2
                 r_numerator, r_denominator = fractions_shortening(
                     r_numerator, r_denominator)
@@ -99,8 +100,7 @@ def p_expression_binop(p):
                     r_numerator, r_denominator)
                 p[0] = str(r_numerator)+'|'+str(r_denominator)
             else:
-                r_numerator = numerator1*denominator2-numerator2 *
-                           denominator1
+                r_numerator = numerator1*denominator2-numerator2 * denominator1
                 r_denominator = denominator1*denominator2
                 r_numerator, r_denominator = fractions_shortening(
                     r_numerator, r_denominator)
@@ -135,24 +135,48 @@ def p_expression_binop(p):
             r_denominator = denominator
             r_numerator, r_denominator = fractions_shortening(
                 r_numerator, r_denominator)
-            p[0] = str(r_numerator)+'|'+str(denominator)
+            p[0] = str(r_numerator)+'|'+str(r_denominator)
         elif p[2] == '*':
-            p[0] = str(numerator*number)+'|'+str(denominator)
+            r_numerator = numerator*number
+            r_denominator = denominator
+            r_numerator, r_denominator = fractions_shortening(
+                r_numerator, r_denominator)
+            p[0] = str(r_numerator)+'|'+str(r_denominator)
         elif p[2] == '/':
-            p[0] = str(numerator)+'|'+str(denominator*number)
+            r_numerator = numerator
+            r_denominator = denominator*number
+            r_numerator, r_denominator = fractions_shortening(
+                r_numerator, r_denominator)
+            p[0] = str(r_numerator)+'|'+str(r_denominator)
     elif '|' in p[3]:
         split = p[3].split('|')
         numerator = int(split[0])
         denominator = int(split[1])
         number = int(p[1])
         if p[2] == '+':
-            p[0] = str(numerator+denominator*number)+'|'+str(denominator)
+            r_numerator = numerator+denominator*number
+            r_denominator = denominator
+            r_numerator, r_denominator = fractions_shortening(
+                r_numerator, r_denominator)
+            p[0] = str(r_numerator)+'|'+str(r_denominator)
         elif p[2] == '-':
-            p[0] = str(numerator-denominator*number)+'|'+str(denominator)
+            r_numerator = numerator-denominator*number
+            r_denominator = denominator
+            r_numerator, r_denominator = fractions_shortening(
+                r_numerator, r_denominator)
+            p[0] = str(r_numerator)+'|'+str(r_denominator)
         elif p[2] == '*':
-            p[0] = str(numerator*number)+'|'+str(denominator)
+            r_numerator = numerator*number
+            r_denominator = denominator
+            r_numerator, r_denominator = fractions_shortening(
+                r_numerator, r_denominator)
+            p[0] = str(r_numerator)+'|'+str(r_denominator)
         elif p[2] == '/':
-            p[0] = str(numerator)+'|'+str(denominator*number)
+            r_numerator = numerator
+            r_denominator = denominator*number
+            r_numerator, r_denominator = fractions_shortening(
+                r_numerator, r_denominator)
+            p[0] = str(r_numerator)+'|'+str(r_denominator)
     elif '|' in p[2]:
         p[0] = p[1] + p[2] + p[3]
     else:
@@ -191,7 +215,8 @@ yacc.yacc()
 
 while True:
     try:
-        s = input('calc > ')
+        s = input('parser => ')
+        parsedExpressions += 1
     except EOFError:
         break
     yacc.parse(s)

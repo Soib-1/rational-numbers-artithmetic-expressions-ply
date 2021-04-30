@@ -282,10 +282,10 @@ class Lexer:
                     tok.lexpos = lexpos
                     self.lexpos = lexpos
                     newtok = self.lexerrorf(tok)
-                    if lexpos == self.lexpos:
-                        # Error method didn't change text position at all. This is an error.
-                        raise LexError(f"Scanning error. Illegal character {lexdata[lexpos]!r}",
-                                       lexdata[lexpos:])
+                    # if lexpos == self.lexpos:
+                    #     # Error method didn't change text position at all. This is an error.
+                    #     raise LexError(f"Scanning error. Illegal character {lexdata[lexpos]!r}",
+                    #                    lexdata[lexpos:])
                     lexpos = self.lexpos
                     if not newtok:
                         continue
